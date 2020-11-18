@@ -13,6 +13,16 @@ class PagSeguroAdapter
         return $this->fetchPagSeguro('v2/checkout', $parsedData, true);
     }
 
+    public function geraSessao(){
+        $sessao = $this->fetchPagSeguro('v2/sessions', null, true);
+        return $sessao->id;
+    }
+
+    public function geraBoleto($data){
+        $parsedData = self::convertItems($data);
+        return $this->fetchPagSeguro('v2/transactions', $parsedData, true);
+    }
+
     public function listTransactions($initialDate, $finalDate)
     {
         return $this->fetchPagSeguro('v2/transactions', ['initialDate' => $initialDate, 'finalDate' => $finalDate]);
@@ -54,6 +64,8 @@ class PagSeguroAdapter
         $this->fetchOptions[CURLOPT_URL] = $this->getUrl($endpoint);
         $this->fetchOptions[CURLOPT_POST] = $post;
         $this->fetchOptions[CURLOPT_RETURNTRANSFER] = true;
+        $this->fetchOptions[CURLOPT_HTTPHEADER] = ['Content-Type: application/x-www-form-urlencoded; charset=UTF-8'];
+
         $this->setDataOptions($post, $data);
 
         $curlSandbox = curl_init();
@@ -63,6 +75,7 @@ class PagSeguroAdapter
 
     private function setDataOptions($post, $data)
     {
+        if(empty($data)) return null;
         if ($post) {
             $this->fetchOptions[CURLOPT_POSTFIELDS] = http_build_query($data);
             return null;

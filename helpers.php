@@ -1,4 +1,5 @@
 <?php
+header('Content-type: text/html; charset=UTF-8');
 
 function pre($data, $stop = true){
     echo '<pre>';
